@@ -1,0 +1,60 @@
+{
+    "title": "JournalJS: Blogging Built on Nirodha",
+    "subtitle": "Posted on Sunday, May 11th, 2014 by Brent",
+    "date": "1399780800000",
+    "markdown": {
+        "sections": [
+            {
+                "title": "",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "It's been a long time since my last post, but I'm finally done with exams and working on projects again. In the past, these postings have been hosted on a wordpress blog, however, I've been seeing nice looking blogs that are more performant and stylish. I felt compelled to build something a little more custom to suit the changes in the blogging format. So, using Nirodha, I've built a UI around JSON entries and created a node app in order to serve those entries. With this post, I introduce my new blogging platform: JournalJS. "
+                    }
+                ]
+            },
+            {
+                "title": "JournalJS",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "JournalJS is an open source blogging platform hosted on Github. It can be accessed at https://github.com/JamesonNetworks/JournalJS. Currently, I'm writing my posts into JSON blocks that are processed by a file adapter called the jsonFiles adapter. I look forward to anyone who wants to use JournalJS forking the repository and writing their own adapters for whatever blogging backends they are currently using!"
+                    }
+                ]
+            },
+            {
+                "title": "The Adapter Format",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "The adapter has two methods, entries() and get_entry(). With the json adapter, I'm just serving some static json files as the entries. However, if you want to write an adapter for any other medium, you can grab the post that you want and massage it the following template format:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "{\n    \"title\": \"template\",\n    \"subtitle\": \"\",\n    \"date\": \"\",\n    \"markdown\" : \n    { \n        \"sections\": [\n            {\n                \"title\": \"\",\n                \"contents\" : \n                [\n                    {\n                        \"type\": \"paragraph\",\n                        \"content\": \"\"\n                    },\n                    {\n                        \"type\": \"code\",\n                        \"content\": \"\"\n                    },\n                    {\n                        \"type\": \"picture\",\n                        \"content\": \"\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "The following code retrieves the list of the files from the filesystem to serve to the front end:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "jsonFiles.prototype.entries = function(current_count) {\n\tvar files = fs.readdirSync(process.cwd() + conf.entries);\n\tvar entries = [];\n\tfor(var i = 0; i < files.length; i++) {\n\t\tif(JSON.stringify(files[i]).indexOf('.json') > 0) {\n\t\t\tvar entry = fs.readFileSync('./' + conf.entries + '/' + files[i], 'utf-8');\n\t\t\tvar jsonEntry = JSON.parse(entry);\n\t\t\t//console.log(JSON.stringify(jsonEntry));\n\t\t\tif(jsonEntry.title !== 'template') {\n\t\t\t\tentries.push(jsonEntry);\t\t\t\n\t\t\t}\t\t\t\n\t\t}\n\t}\n\treturn entries.reverse();\n}"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "And I'm redirecting the direct get entry with the following code in the server given that we're using the jsonFiles adapter:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "if(conf.adapter === 'jsonFiles') {\n\trouter.use('/', express.static(__dirname + conf.entries));\t\n}\nelse {\n\trouter.use('/', function(req, res) {\n\t\tvar adapter = require('./bin/' + conf.adapter);\n\t\tvar entry = adapter.get_entry(req.url);\n\t});\n}"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "So feel free to fork JournalJS and post any issues you run into on Github!"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,66 @@
+{
+    "title": "Passing Data Between Forms in C#",
+    "subtitle": "Posted on May 9, 2012 by Brent",
+    "date": "1336536000000",
+    "markdown": {
+        "sections": [
+            {
+                "title": "",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "Continuing on the path of trying different languages and working with different aspects of programming, my latest endeavor has involved programming a simple GUI to interact with a utility I’m creating for our work to manage a file that is spread across the network. We have a central location that we want to store the file at, and keep multiple copies on each PC. The problem is seeing if the files are synced across the network, and if they aren’t synced, looking at them to determine what the difference between the “master” file and the remote file is. We need to be able to do this because the files hold configuration specific information for the computer, but a user may have changed the configuration to accomplish a task. Clobbering their configuration without understanding it would be a step in the wrong direction. Currently, we use scripts to push out the latest copy of the “master” file, and backup the previous copy. However, if someone executes the script twice, it will overwrite configuration information. I’ll probably be writing a blog post in the future and open sourcing the utility, but we’ll see about that depending on how the code turns out."
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "In the meantime, the first hurdle to accomplishing this task is creating the way for a user to define a list of computers they wish to monitor and then passing that list back into the main program to actually do the processing. I read a tutorial on passing information between forms with event handlers and found it a little difficult to wade through, so I’m reiterating the process here with a little bit more simplified code to get a handle, in my own mind, of how it works. Please feel free to leave comments if this is the wrong way to approach this problem, it’s my first time really digging into the C# event structure and really my first time working on a GUI-based application. I’m used to writing scripts and command line utilities."
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "The event model of Windows forms seems to rely on three things to accomplish event handling. The first is a parent form which subscribes to the handler of a child form. The second is the child form. The third is the arguments that get passed between the forms in an event arguments object. In this example, I’m going to use some very simple components to move data back and forth: a delegate, an event, an event handler, and a custom class of event arguments. The first thing to look at is the event arguments to be passed between the forms:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "    public class DataUpdateEventArgs : EventArgs\n    {\n        private string data;\n\n        public string Data\n        {\n            get { return data; }\n            set { data = value; }\n        }\n\n        public DataUpdateEventArgs(string nData)\n        {\n            this.data = nData;\n        }\n    }"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "This code shows a class named DataUpdateEventArgs which allows the passing of a string into the event object. This is the object we will use to extract the data passed by the form that takes user input. It’s fairly straight forward."
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "The next step is to add an event handler that uses these arguments along with a delegate for the event to the event that is going to be subscribed to by the parent form."
+                    },
+                    {
+                        "type": "code",
+                        "content": "        public delegate void DataUpdateHandler(\n            object sender, DataUpdateEventArgs e);\n\n        public event DataUpdateHandler DataUpdated;"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "In this code, we’ve added the delegate handler and the event ‘DataUpdated’. For the delegate event, we are passing our custom EventArgs extended class DataUpdateEventArgs to include the custom string we are intended to pass. The next step is to fire off the event when our button is clicked and take the data from the component TextBox1 and pass it to the event (in this case the button is named buttonSend):"
+                    },
+                    {
+                        "type": "code",
+                        "content": "        private void buttonSend_Click(object sender, EventArgs e)\n        {\n            string newData = textBox1.Text;\n\n            DataUpdateEventArgs args = new DataUpdateEventArgs(newData);\n\n            DataUpdated(this, args);\n\n            this.Dispose();\n        }"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "So here we create a new DataUpdateEventArg object using a constructor to pass the string into the object, and then change the state of the event DataUpdated for this form along with passing it the new event argument. After that, we dispose of the form."
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "Our form to send data is now publishing an event that a parent form can subscribe to. In our parent form, this text is going to get dumped into a label so we can see the change on the screen:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "        private void buttonNewForm_Click(object sender, EventArgs e)\n        {\n            SendingForm f = new SendingForm();\n\n            f.DataUpdated += new SendingForm.DataUpdateHandler(SendingForm_ButtonClicked);\n\n            f.Show();\n\n        }\n\n        public void SendingForm_ButtonClicked(object sender, DataUpdateEventArgs e)\n        {\n            lblData.Text = e.Data;\n        }"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "Looking at this code, we see two things happening. A form of type SendingForm is created which has the event argument object that our parent form is going to subscribe to. The event is going to be associated with a function included in the parent form called SendingForm_ButtonClicked. This function isn’t tied to any event on the parent form, but instead the code is run when the state of the subscribed event changes. The result will launch a form, allow a user to enter information into a text box. When the user hits save, the form will change the label from lblText to whatever custom text was entered in:"
+                    }
+                ]
+            }
+        ]
+    }
+}

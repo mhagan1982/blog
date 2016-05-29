@@ -1,0 +1,34 @@
+{
+	"title": "This is a template",
+	"subtitle": "Templates are good",
+	"date": "0000000000000",
+	"markdown" : 
+	{ 
+		"sections": [
+			{
+				"title": "First Section",
+				"contents" : 
+				[
+					{
+						"type": "paragraph",
+						"content": "First paragraph"
+					},
+					{
+						"type": "code",
+						"content": "int k = 5"
+					},
+					{
+						"type": "quote",
+						"content": "A quote, by any other markdown, wouldn't look the same"
+					},
+                    {
+                        "type": "picture",
+                        "id": "1",
+                        "fileType": "png",
+                        "altText": "Picture 1"
+                    }
+				]
+			}
+		]
+	}
+}

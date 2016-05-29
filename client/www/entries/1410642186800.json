@@ -1,0 +1,76 @@
+{
+	"title": "The Nirodha Refactoring - Part 1",
+	"subtitle": "By Brent Jameson",
+	"date": "1410642186800",
+	"markdown" : 
+	{ 
+		"sections": [
+			{
+				"contents" : 
+				[
+					{
+						"type": "paragraph",
+						"content": "This week, I decided to refactor a project of mine called Nirodha. Nirodha is a small utility for creating and deploying websites. It manages javascript and css dependencies so you can simply focus on getting some work done. I've been thinking about expanding on it for a long time, and one thing I was really after was incorporating the bower package manager into it. My plan is to work that new feature after my refactoring is complete."
+					}
+				]
+			},
+			{
+				"title": "Step 1: Collect new features",
+				"contents" : 
+				[
+					{
+						"type": "paragraph",
+						"content": "The first thing I wanted to do was work out the next major features I wanted to introduce into Nirodha. This would give me an idea of the surfaces of the software that needed work. I would know where I need to expand on functionality and where new functionality is being inserted."
+					},
+					{
+						"type": "paragraph",
+						"content": "The first feature that came to mind was the ability to add in bower support. This will affect the directories that Nirodha reads from, and will require adding in some special logic to figure out where the dependency JS and CSS files are located. Doesn't sound too bad. The second feature is a 'watch' mode. I want to be able to put nirodha into a watch mode, and redeploy the site anytime the file system code changes. This will allow me to more easily incorporate nirodha projects as separate frontend code bases, while allowing the created assets to be served from a standard web server without constantly redeploying the minified files. The third and final feature is allowing multiple views to be deployed at once. This means that running a nirodha -d will deploy all the views of the project, in the event that none are specified."
+					},
+					{
+						"type": "quote",
+						"attributedTo": "Martin Fowler",
+						"content": "You can almost do this as an exercise. Look at some program and see if there's some duplication. Then, without really thinking about what it is you're trying to achieve, just pigheadedly try to remove that duplication. Time and time again, I've found that by simply removing duplication I accidentally stumble onto a really nice elegant pattern. It's quite remarkable how often that is the case. I often find that a nice design can come from just being really anal about getting rid of duplicated code. "
+					}
+				]
+			},
+			{
+				"contents": 
+				[
+					{
+						"type": "paragraph",
+						"content": "The most important aspect of this refactoring was test coverage. I believe that if you do not have test coverage, refactoring is much more difficult. Nirodha already has a solid set of tests in place providing test coverage over most of the code base, so I was able to refactor with impunity for the most part. I did run into some issues after the refactoring was complete with features not working. I've updated the tests to address some of those holes."
+					},
+					{
+						"type": "paragraph",
+						"content": "Refactoring to me used to be about removing duplicated code and getting patterns in place where they belong once more is understood about the software product being developed. I still believe these are important goals in refactoring. I also have a new rule: Get all the crazy in one place. I believe that if you have something that is difficult to abstract and ends up being clunky, you should wrap it in a nice class and throw nice exceptions out of it. Just make sure you have some easy way for your project to consume it, so eventually you can either weed out the crazy, or sweep it far enough under the rug that you don't have to worry about it. The other advantage of this approach, is that if exceptions come from that layer, you know its going to be bad. This helps you estimate fix times."
+					},
+					{
+						"type": "quote",
+						"content": "Get all the crazy in one place.",
+						"attributedTo": "Brent Jameson"
+					},
+					{
+						"type": "paragraph",
+						"content": "For me, this meant getting everything related to deploying and serving files in either the same place or very close together. Unfortunately, the deploy process and the serve process are very different beasts, so they are still separate. The class that handles deploying (and several other nirodha functions) is the nirodhaManager. This blobby, poorly named mess of a class is all of the crazy that nirodha needs to do. Putting it in the one place gives it a testable surface, and some opportunities for refactoring. All of the duplicated code in that class has been pulled out into functions, and some of it has been pulled out into a utility class. This class is shared by nirodhaManager and libraryManager and puts all of the logic for finding libraries, filtering file types, and deriving the working path of nirodha in one place. This also allowed me to delete the 'path_to_nirodha' variable from the settings of nirodha, which makes first time setup less painful. "
+					},
+					{
+						"type": "paragraph",
+						"content": "At the end of the nirodha refactoring, I had twenty four test cases and 81% test coverage on Nirodha as a whole."
+					},
+					{
+						"type": "picture",
+                        "id": "1",
+                        "fileType": "png",
+                        "altText": "Test output"
+					},
+					{
+						"type": "picture",
+                        "id": "2",
+                        "fileType": "png",
+                        "altText": "Statement coverage"
+					}
+				]
+			}
+		]
+	}
+}

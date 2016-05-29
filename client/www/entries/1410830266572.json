@@ -1,0 +1,120 @@
+{
+	"title": "Open Source Testing Tools",
+	"subtitle": "Pursuing 100% test coverage for Nirodha",
+	"date": "1410830266572",
+	"markdown" : 
+	{ 
+		"sections": [
+			{
+				"title": "",
+				"contents" : 
+				[
+					{
+						"type": "paragraph",
+						"content": "As I worked on refactoring Nirodha, I noticed something in other repositories that I wanted to copy. Several large projects had badges about test coverage and dependency status and all kinds of interesting information about their code. So, I decided I wanted to get some of those also, and set about making it happen with Nirodha."
+					},
+					{
+						"type": "paragraph",
+						"content": "The first step was to figure out which service providers provided access to the variety of badges. I started with TravisCI, the most common service for continuous integration. I also added Coveralls, Code Climate, and David.io for code coverage, code quality, and dependency status respectively. I set about getting TravisCI integrated and worked on increasing my test coverage."
+					},
+					{
+						"type": "paragraph",
+						"content": "TravisCI required adding a .travis.yml file. This file contained the following:"
+					},
+					{
+						"type": "code",
+						"content" : "language: node_js\nnode_js:\n  - \"0.11\"\n  - \"0.10\""
+					},
+					{
+						"type": "paragraph",
+						"content": "This will tell TravisCI what versions of node to build on. Now that you have github tied into TravisCI and your .travis.yml file populated, when you make commits and pushes to git, your source code will automatically get built and tested."
+					}
+				]
+			},
+			{
+				"title": "David-dm",
+				"contents":
+				[
+					{
+						"type":"paragraph",
+						"content": "The next step was to set up David-dm in order to monitor the dependencies listed in package.json and alert me when they get out of date. This was also an extremely easy process, and once the package was published into npm, I could very quickly see which dependencies needed to be updated."
+					},
+					{
+						"type":"paragraph",
+						"content": "See more at https://david-dm.org/JamesonNetworks/Nirodha"
+					}
+				]
+			},
+			{
+				"title": "Coveralls",
+				"contents":
+				[
+					{
+						"type":"paragraph",
+						"content": "Coveralls will take an lcov printed set of unit tested results, and display the amount of code coverage that you have with your unit tests."
+					},
+					{
+						"type":"paragraph",
+						"content": "See more at https://coveralls.io/r/JamesonNetworks/Nirodha"
+					}
+				]
+			},
+			{
+				"title": "Code Climate",
+				"contents":
+				[
+					{
+						"type":"paragraph",
+						"content": "Code Climate was my favorite. Code Climate rates your code and gives it a GPA based on different metrics. It also shows you your code coverage and a line by line break down of what is being tested and what is not. I really think that it was one of the coolest tools I've ever used in software development. I was able to increase my code coverage to 91% using code climate very quickly."
+					},
+					{
+						"type": "picture",
+						"id":"1",
+                        "fileType": "png",
+                        "altText": "Test output"
+					},
+					{
+						"type":"paragraph",
+						"content": "After improving that test coverage, I poked around with some of the other things Code Climate provides. It will rate your classes in terms of how well they are abstracted or how complex they are."
+					},
+					{
+						"type": "picture",
+						"id":"2",
+                        "fileType": "png",
+                        "altText": "Test output"
+					},
+					{
+						"type":"paragraph",
+						"content": "The feature that I found most helpful was the actual display of all the lines of code and the levels of coverage. It was very helpful in increasing the amount of test coverage I had."
+					},
+					{
+						"type": "picture",
+						"id":"3",
+                        "fileType": "png",
+                        "altText": "Test output"
+					},
+					{
+						"type":"paragraph",
+						"content": "See more at https://codeclimate.com/github/JamesonNetworks/Nirodha"
+					}
+				]
+			},
+			{
+				"title": "The final README.md file",
+				"contents":
+				[
+					{
+						"type":"paragraph",
+						"content": "Finally, here's the README.md file. Get a load of all those badges."
+					},
+					{
+						"type": "picture",
+						"id":"4",
+                        "fileType": "png",
+                        "altText": "Test output"
+					}
+				]
+			}
+		]
+	}
+}

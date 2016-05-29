@@ -1,0 +1,94 @@
+{
+    "title": "Nirodha - Simple JS and CSS management for websites",
+    "subtitle": "Posted on Saturday, March 14th 2014 by Brent",
+    "date": "1394893880503",
+    "markdown": {
+        "sections": [
+            {
+                "title": "",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "Nirodha (in the context of the four truths in Buddhism) is the absence of suffering. I've created a project by the same name which aims to reduce the suffering that is arranging javascript libraries and CSS files for developing websites. I'm tired of maintaining source maps and keeping track of whether I've deployed this minified file or that uncompressed js files. I wanted a system in which I could dynamically insert libraries and style sheets, debug them easily, and then deploy minified versions of the final product. This is what Nirodha does."
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "Nirodha is a command line utility with 3 main switches for creating and managing projects (a project is typically one website and views inside of the project are the html pages). Nirodha can create projects and views, serve up the assets for those views, and deploy those views into compiled sites with minified css and js. The project is written in node.js and hosted on Github at https://github.com/JamesonNetworks/Nirodha."
+                    }
+                ]
+            },
+            {
+                "title": "Using Nirodha",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "To use nirodha, check out the repository, run npm update to get the required libraries, and then add that directory to your path environment variable. Then, copy the settings_template.json file into settings.json and set the 'path_to_nirodha' variable to the nirodha path. Nirodha requires that node and npm be installed order to work. Now, let's take a look at the structure of a project!"
+                    }
+                ]
+            },
+            {
+                "title": "Structure",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "A nirodha project contains two directories, 'custom' and 'deploy'. The Custom directory is where you can drop all of your custom libraries for a particular project. CSS and js files in this directory will be compiled and minified when referenced in the project. The 'static' folder will be served as if all its files were in the root of the webserver directory. The templates file is for offloading your html templates which you reference in the main html view (I typically use Mustache templates). In the root of the project are the view html files, describing json files which contain all of the library references for a project, and the info.json file which is for Nirodha's internal use. When you are developing a web page and want to add a new js library to the page, simply open the $view.json file and add the reference to the appropriate place. The references are arranged in an array form and have a 'title' and 'libs' property. The title property is used as a place holder to inject the references in the web site (so you can have multiple library sets in given page which allows you to load the js/css either before the page loads completely or after it loads). For instance, if your title was {pre-load}, in your html page you can put the {pre-load} token in the head section of the site and this token will be replaced with the appropriate library references on serving and deploying the page. Take a look at the example project to get a feel for how this works."
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "Creating a project with nirodha is as simple as running: "
+                    },
+                    {
+                        "type": "code",
+                        "content": "'nirodha -c $projectname'"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "The created project will have the default index.html view and associated files. In addition to custom js and css for individual projects, there is also a libs folder in the nirodha root. This folder can hold all of your shared libraries between different sites and references can then be made to the files here as well. So for standard libraries that you will want to use in just about every site, just drop them into the libs folder and then create a reference in your project, nirodha will do the rest."
+                    }
+                ]
+            },
+            {
+                "title": "Serving your site",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "After you have your references for a project set, you can serve the page using the:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "'nirodha -s'"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "command. This will require sudo unless you set the port higher, but as a default it is set at 80. This runs a webserver that will serve all of the assets as listed in the project. On each page load, the libraries are read and served up. This allows you to develop using the uncompressed js files."
+                    }
+                ]
+            },
+            {
+                "title": "Deploying your site",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "Once you are done developing the site, you can run:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "'nirodha -d $view'"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "This deploys the view for your application, reading in all of the referenced js and css, putting them into new files, and compiling and minifying them. The references will be added to the site in the form of '$view-$token.js' or '$view-$token.css'. As a final product you will have a website with the smallest number of outside references possible."
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "I'm using this project to build and manage http://www.semipho.com. If you view the source on semipho, you will see I have two sections of libraries referenced, the pre-load and post-load sections which generate 5 files overall, a js and css for before loading, an html file with all of the templates injected, and a js and css after loading in init anything that needs to be setup after the DOM has loaded. This allows me the convenience of developing using all uncompressed libraries and deploying a project which only has 5 required connections to the server to get the smallest possible CSS and JS files!"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "I've released this project under the MIT license and hope that you find it useful to use in your projects!"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,72 @@
+{
+	"title": "Adding image support to JournalJS",
+	"subtitle": "Posted on May 21, 2014 by Brent",
+	"date": "1400718164180",
+	"markdown" : 
+	{ 
+		"sections": [
+			{
+				"title": "",
+				"contents" : 
+				[
+				    {
+                        "type": "picture",
+                        "id": "1",
+                        "fileType": "png",
+                        "altText": "Picture 1"
+                    },
+					{
+						"type": "paragraph",
+						"content": "As you can see, I've added image support into JournalJS. These images are responsive thanks to Twitter's Bootstrap and they have a format that allows the blog maker to simply index them by number and refer to them as any other content entry. I'll go into the details about their format in the JSON blog entry in the following section."
+					}
+				]
+			},
+			{
+				"title": "The Code",
+				"contents" : 
+				[
+					{
+						"type": "paragraph",
+						"content": "The code for introducing images was fairly simple. I'm expanding on the existing content system, adding a filter for the content type picture. Then I take the information in the content entry, dump it into an image template with the proper classes, and present it on the page. The picture entries have the format of the date of the entry for the filename plus an index by which to refer to them. The resulting filename looks like:"
+					},
+					{
+						"type": "code",
+						"content": "1400718164180_1.png"
+					},
+					{
+						"type": "paragraph",
+						"content": "Once the pictures are created, they are served along with the blog entries themselves. I added the filter in the index.js for the blog app:"
+					},
+					{
+						"type": "code",
+						"content": "\tfor(var i = 0; i < sections.length; i++) {\n\t\tvar section = sections[i];\n\t\tfinalHtml += Mustache.to_html(sectionHeaderTemplate, section);\n\t\tfor(var k = 0; k < section.contents.length; k++) {\n\t\t\tvar content = section.contents[k];\n\t\t\tswitch(content.type) {\n\t\t\t\tcase 'paragraph':\n\t\t\t\t\tfinalHtml += Mustache.to_html(sectionContentParagraphTemplate, content);\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'code':\n\t\t\t\t\tfinalHtml += Mustache.to_html(sectionContentCodeTemplate, content);\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'quote':\n\t\t\t\t\tfinalHtml += Mustache.to_html(sectionContentQuoteTemplate, content);\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'picture':\n\t\t\t\t\tvar picture = {};\n\t\t\t\t\tpicture.url = conf.blogserver + '/' + post.date + '_' + content.id + '.' + content.fileType;\n\t\t\t\t\tpicture.alttext = content.altText;\n\t\t\t\t\tfinalHtml += Mustache.to_html(sectionContentPictureTemplate, picture);\n\t\t\t\t\tbreak;\n\t\t\t\tdefault:\n\t\t\t}\n\t\t}\n\t}"
+					},
+					{
+						"type": "paragraph",
+						"content": "The structure of the pictures in the blog post look like this:"
+					},
+					{
+						"type": "code",
+						"content": "{\n\t\"type\": \"picture\",\n\t\"id\": \"1\",\n\t\"fileType\": \"png\",\n\t\"altText\": \"Picture 1\"\n}"
+					},
+					{
+						"type": "paragraph",
+						"content": "And when we put it all together we can see pictures in our blog post!"
+					},
+                    {
+                        "type": "picture",
+                        "id": "2",
+                        "fileType": "png",
+                        "altText": "Picture 2"
+                    },
+                    {
+						"type": "quote",
+						"content": "So long and thanks for all the fish!",
+						"attributedTo": "Hitchhiker's Guide to the Galaxy"
+
+					}
+				]
+			}
+		]
+	}
+}

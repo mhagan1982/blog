@@ -1,0 +1,154 @@
+{
+    "title": "Parsing Text Web Service 101",
+    "subtitle": "Posted on January 30, 2013 by Brent",
+    "date": "1359522000000",
+    "markdown": {
+        "sections": [
+            {
+                "title": "",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "It has been a long time since I’ve posted to the blog, but I have been extremely busy with graduate school for just about all of last semester. I’ve toned it down this semester, reduced my coursework, and am ready to get back into some hobbyists projects. In that spirit, I’m going to talk about a project I’ve spent a couple of days on since the new year that involves parsing text out of one system and into another system."
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "One of my tasks for this year has been grabbing data out of our database and creating a new format that is importable by a facility which uses our business as a subcontracted business. These have been termed electronic data deliverables and I’ll refer to them as EDDs for the rest of the post. EDDs sometimes have very unique quarks because different agencies and companies have wildly different ideas of workflows and process internally."
+                    }
+                ]
+            },
+            {
+                "title": "When you have a hammer, everything looks like a nail",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "My main accomplishment of last year was the development of a web based system that handles some of the internal inventory requirements of our company. This system has the ability to query our main database through an API provided by the vendor and track where items in our organization and when they need to be disposed of. Since this infrastructure was already in place and built on C# (and everyone was familiar with the system) I decided that this functionality could feature creep its way into a tab in that MVC application. Eventually, I plan to rework the interface to separate the functions and make a more intelligent menu system, but for now, I just need this today."
+                    }
+                ]
+            },
+            {
+                "title": "Threading the needle",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "Our system has the ability to export data in the form of comma delimited values by default. Using this built in functionality, I extracted the data from the source db and began to build a class that could extract the separate columns and rebuild the resulting file in the desired structure. I created a new controller and view in my MVC application and began to build the view first, allowing the user to submit a file to the controller."
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "In my main application layout I added:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "@Html.ActionLink(\"EDD Creator\", \"Index\", \"EDDGenerator\")"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "This creates a link which says “EDD Generator” and points to the index action of the EDDGenerator controller. Then in the views folder I created a EDDGenerator subfolder and an index.cshtml view. the first thing I’m going to do is allow the user select the file and submit the file to the process action:"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "This will allow the user to submit their file to my controller. Now I go and add the controller action for “Process” so that this form will actually do something (there is also an index controller, with the only statement being “return View()”:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "        public ActionResult Index()\n        {\n            return View();\n        }\n        [HttpPost]\n        public ActionResult Process()\n        {\n        }"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "At this point, I didn’t know what was going to actually happen. I needed to figure out how this controller was going to handle the csv file that had been submitted. I put in a nonsense statement (int i = 1) and added a break point to investigate the “Request” element in the watch screen to figure out what to do with the submitted request."
+                    },
+                    {
+                        "type": "picture",
+                        "id": "1",
+                        "fileType": "png",
+                        "altText": "Picture 1"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "A little bit of googling later, and I discover that this file needs to be set into a HttpPostedFileBase variable in order to be accessed in the manner I’m after. I cast the file into this variable and pass it into a class that will handle the data manipulation. This declared “processor” will have a collection of a class of type “Sample” and the sample has a collection of class type “Result.” I chose this method because of how the data must be show in the final product (a sample becomes a sort of ‘heading’ row in the final csv and the results are contained under each sample). In order to accomplish this, I decided to create a class and pass the file into the constructor for processing. The collection would be a member of the class to be accessed after the processing was completed."
+                    },
+                    {
+                        "type": "code",
+                        "content": "            HttpPostedFileBase csv_file = Request.Files[\"csv_file\"];\n            if (csv_file != null)\n            {\n                Processor fileProcess = new Processor(csv_file);\n            }"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "I verified this was working and that the file was getting passed into the class and then started the process of breaking down the text. In the processor class, I save the downloaded file to a directory on the server:\n(In the constructor of Processor.cs)"
+                    },
+                    {
+                        "type": "code",
+                        "content": "        Samples = new List();\n        var fp = Path.Combine(HttpRuntime.AppDomainAppPath, \"ImportUploads/\", Path.GetFileName(uploadFile.FileName));\n        try\n        {\n            uploadFile.SaveAs(fp);\n        }\n        catch (IOException ex)\n        {\n            System.IO.IOException e = new IOException(\"Problem uploading \" + uploadFile.FileName + \" \" + ex.Message, ex);\n            throw e;\n        }"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "and begin to read in lines of the file (notice that I throw the exception from this class which I will catch in the process controller should anything go wrong):"
+                    },
+                    {
+                        "type": "code",
+                        "content": "        var fileIn = new FileInfo(fp);\n        var reader = fileIn.OpenText();\n        var tfp = new TextFieldParser(reader) { TextFieldType = FieldType.Delimited, Delimiters = new[] { \",\" } };\n        int i = 0;\n        String[] headers = tfp.ReadFields();\n\n        while (!tfp.EndOfData)\n        {"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "The first line of my CSV is processed out into a headers object to make it easy to figure out the index of the pieces of data which I need later on. Adding a break point at the while line allows me to investigate the headers array of strings and I use the index of the array to access information in later lines. The ReadFields() method will also move the cursor to the next line, allowing me to exclude the headers in the processed file (where they do not need to be). Inside of the while loop, I read the lines of data into an array of strings and use const ints as indexes for the desired information (this is the fastest way to accomplish my goal, but I’ll talk about improving it later)."
+                    },
+                    {
+                        "type": "code",
+                        "content": "            String[] parts = tfp.ReadFields();\n            Sample thisSample = new Sample();\n            thisSample.DATA1 = parts[INDEXOFDATA1];\n            thisSample.DATA2 = parts[INDEXOFDATA2];\n...snip...\n            Samples.Add(thisSample);"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "and then do the same thing for results. In my source datafile, all the data I need is on every single line. This is a constraint of the export format from the original database. To get around this, I process and sample and result object on every single line, however I only add the sample to the collection if it is a unique sample. When processing a result, I use a piece of information that the sample and result share to locate the proper sample to add the result to. Each sample object has a collection of result objects as a list. At the end of the process I close the file:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "tfp.Close();"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "Now, in my controller, I have a properly formed collection of all the samples and results that were in the source csv file. I process this collection, build a long string of all the samples and results, and then return them as a file output stream download:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "                    foreach (Sample s in fileProcess.Samples)\n                    {\n                        ViewBag.Samples += i + \", \" s.ToString() + \"\\n\";\n                        i++;\n                        foreach (Result r in s.Results) \n                        {\n                            ViewBag.Samples += i + \", \" + r.ToString() + \"\\n\";\n                            i++;\n                        }\n                    }\n                    ViewBag.Result = \"Success!!\";\n                    string reportString = ViewBag.Samples;\n                    string sampleName = \"-\" + fileProcess.Samples.ElementAt(0).Name + \"-\";\n\n                    return new WebDisposalTool.Models.FileStringResult(reportString, \"application/text\"){ FileDownloadName = \"FIN_CSV_\" + sampleName + DateTime.Now.ToLocalTime().ToString() + \".csv\" };"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "Or at the end of the controller if something has gone wrong, I catch any exceptions thrown and return those in the viewbag to a view instead (if you are unfamiliar with C# MVC, the ViewBag is a dynamic variable (might be wrong nomenclature) that is evaluated at run time allowing you to store information that you want to pass to the view from the controller)."
+                    },
+                    {
+                        "type": "code",
+                        "content": "            catch (IOException e)\n                {\n                    ViewBag.Result = e.Message;\n                }\n            }\n\n            return View();"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "I created a view.cshtml in the EDDGenerator view folder also to render this error for the user should it ever occur."
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "Here is the entire controller:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "        [HttpPost]\n        public ActionResult Process()\n        {\n            HttpPostedFileBase csv_file = Request.Files[\"csv_file\"];\n            int i = 1;\n\n            if (csv_file != null)\n            {\n                try\n                {\n                    Processor fileProcess = new Processor(csv_file);\n\n\n                    foreach (Sample s in fileProcess.Samples) \n                    {\n                        ViewBag.Samples += i + \", \" + s.ToString() + \"\\n\";\n                        i++;\n                        foreach (Result r in s.Results) \n                        {\n                            ViewBag.Samples += i + \", \" + r.ToString() + \"\\n\";\n                            i++;\n                        }\n                    }\n                    ViewBag.Result = \"Success!!\";\n                    string reportString = ViewBag.Samples;\n                    string sampleName = \"-\" + fileProcess.Samples.ElementAt(0).Name + \"-\";\n\n                    return new WebDisposalTool.Models.FileStringResult(reportString, \"application/text\"){ FileDownloadName = \"FILE-\" + sampleName + DateTime.Now.ToLocalTime().ToString() + \".csv\" };\n\n                }\n                catch (IOException e)\n                {\n                    ViewBag.Result = e.Message;\n                }\n            }\n\n            return View();\n        }"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "And here is the entire processor class:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\nusing System.Web;\nusing System.Web.Mvc;\nusing System.IO;\nusing Microsoft.VisualBasic.FileIO;\n\n/// \n\n/// Summary description for Processor\n/// \n\npublic class Processor\n{\n    public List Samples;\n\n    //Sample Indexes\n    const int DATAINDEX1 = 38;\n    const int DATAINDEX2 = 105;\n    ...snip....\n    const int DATAINDEX132 = 927;\n\n    public Processor(HttpPostedFileBase uploadFile)\n    {\n        Samples = new List();\n        var fp = Path.Combine(HttpRuntime.AppDomainAppPath, \"ImportUploads/\", Path.GetFileName(uploadFile.FileName));\n        try\n        {\n            uploadFile.SaveAs(fp);\n        }\n        catch (IOException ex)\n        {\n            System.IO.IOException e = new IOException(\"Problem uploading \" + uploadFile.FileName + \" \" + ex.Message, ex);\n            throw e;\n        }\n\n        var fileIn = new FileInfo(fp);\n        var reader = fileIn.OpenText();\n        var tfp = new TextFieldParser(reader) { TextFieldType = FieldType.Delimited, Delimiters = new[] { \",\" } };\n        int i = 0;\n        String[] headers = tfp.ReadFields();\n\n        while (!tfp.EndOfData)\n        {\n            // Read in all of the fields from the first line of the file\n            String[] parts = tfp.ReadFields();\n\n                // Process the sample\n                Sample thisSample = new Sample();\n                thisSample.DATA1 = parts[DATAINDEX1];\n                ...snip...\n                thisSample.DATA132 = parts[DATAINDEX132];\n\n                Boolean alreadyAdded = false;\n                foreach (Sample s in Samples)\n                {\n                    if (s.DATA1.CompareTo(thisSample.DATA1) == 0)\n                    {\n                        alreadyAdded = true;\n                    }\n\n                }\n\n                if (!alreadyAdded)\n                {\n                    Samples.Add(thisSample);\n                }\n\n                // Process the result\n                Result thisResult = new Result();\n                thisResult.DATA1 = parts[DATAINDEX1];\n                ...snip...\n                thisSample.DATA132 = parts[DATAINDEX132];\n\n                foreach (Sample s in Samples)\n                {\n                    if (s.DATA1.CompareTo(thisResult.DATA1) == 0)\n                    {\n                        s.Results.Add(thisResult);\n                    }\n\n                }\n            }\n        }\n\n        tfp.Close();\n    }\n}"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "And finally the file return class which I created and referenced above (this was found from googling also):"
+                    },
+                    {
+                        "type": "code",
+                        "content": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\nusing System.Web;\nusing System.Web.Mvc;\n\nnamespace WebDisposalTool.Models\n{\n    public class FileStringResult : FileResult\n    {\n            public string Data { get; set; }\n\n            public FileStringResult(string data, string contentType)\n                : base(contentType)\n            {\n                Data = data;\n            }\n\n            protected override void WriteFile(HttpResponseBase response)\n            {\n                if (Data == null) { return; }\n                response.Write(Data);\n            }\n    }\n}"
+                    }
+                ]
+            }
+        ]
+    }
+}

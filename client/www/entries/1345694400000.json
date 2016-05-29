@@ -1,0 +1,46 @@
+{
+    "title": "Reversing a Variable Assignment with Bash",
+    "subtitle": "Posted on August 23, 2012 by Brent",
+    "date": "1345694400000",
+    "markdown": {
+        "sections": [
+            {
+                "title": "",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "Today I’m going to blog about reversing a string using the bash shell. There are several times when I’m working with legacy VBA code for forms in excel that I end up with a variable list like this to populate the form:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "    Range(\"E74\").Value = Me.text1\n    Range(\"E75\").Value = Me.text2\n    Range(\"E76\").Value = Me.text3"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "Now when the user hits “Ok,” these new values need to populate these excel cells with a list like this:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "    Me.text1= Range(\"E74\").Value\n    Me.text2= Range(\"E75\").Value\n    Me.text3= Range(\"E76\").Value"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "There are probably a plethora of ways to handle this, but since I typically have an SSH session open to my linux server, I decided to go with a low overhead bash shell. The goal of this code is to take in either the top input or the bottom input and produce the reverse result. It’s trivial to accomplish with a short script:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "#!/bin/bash\n\ncat $1|while read line; do\n    out=\"\"\n    for w in $line; do\n        out=\"$w $out\"\n    done\necho $out\ndone"
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": "Now I make a text file with the values I want to reverse, and pass that file name as an argument to the script:"
+                    },
+                    {
+                        "type": "code",
+                        "content": "b@ssh:~/Documents/scripts> ./reverse.sh test.txt\nMe.text1 = Range(\"E74\").Value\nMe.text2 = Range(\"E75\").Value\nMe.text3 = Range(\"E76\").Value\nb@ssh:~/Documents/scripts>"
+                    }
+                ]
+            }
+        ]
+    }
+}

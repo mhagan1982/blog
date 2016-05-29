@@ -1,0 +1,30 @@
+{
+    "title": "Full Fledged Production Application",
+    "subtitle": "Posted on May 16, 2012 by Brent",
+    "date": "1337140800000",
+    "markdown": {
+        "sections": [
+            {
+                "title": "",
+                "contents": [
+                    {
+                        "type": "paragraph",
+                        "content": "So I’m embarking on my first full fledged application that I plan to use in production. The company I work for has a piece of software that relies on files on each client computer in order to import data into our main database from different software packages. In order to achieve this, entries from the individual pieces of software need to be matched up to the names of entries as they exist in our main database. These files are called “crosstables.” Normally, the crosstables exist on a network share, however this allows people in one department to mangle crosstables from another department. Using Visual Studio 2010 C# Express, I created an application that uses the .NET 4.0 framework, runs an MD5 hash on each of the files located on individual workstations, and compares it to the MD5 hash of a file on the local computer running the manager program. The layout of the software is included in pictures at the end of this entry. The program allows you to build lists of computers and then save and load those lists. I’m particularly proud of the design principles espoused by Brett Victor in the settings tab using a sentence a link label to toggle the custom settings."
+                    },
+                    {
+                        "type": "picture",
+                        "id": "1",
+                        "fileType": "png",
+                        "altText": "Picture 1"
+                    },
+                    {
+                        "type": "picture",
+                        "id": "2",
+                        "fileType": "png",
+                        "altText": "Picture 2"
+                    }
+                ]
+            }
+        ]
+    }
+}
