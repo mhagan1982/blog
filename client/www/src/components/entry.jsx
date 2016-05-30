@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import {getBaseUrl} from '../main/util';
-import $ from 'jQuery';
+import $ from 'jquery';
 
 require('./entry.scss');
 require('../main/prettify.js');

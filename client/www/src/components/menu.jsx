@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import _ from 'lodash';
-import $ from 'jQuery';
+import $ from 'jquery';
 
 require('../main/select.js');
 require('./menu.scss');
