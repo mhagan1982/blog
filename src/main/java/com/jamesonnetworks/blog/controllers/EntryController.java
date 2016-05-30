@@ -1,5 +1,6 @@
 package com.jamesonnetworks.blog.controllers;
 
+import com.google.gson.Gson;
 import com.jamesonnetworks.blog.domain.entry.Entry;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.core.io.Resource;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -20,8 +21,9 @@ import java.util.ArrayList;
 public class EntryController {
 
     @RequestMapping(path="/entries", method= RequestMethod.GET)
-    public ArrayList<String> getAllEntries() {
-        ArrayList<String> entries = new ArrayList<>();
+    public ArrayList<Entry> getAllEntries() {
+        ArrayList<File> entries = new ArrayList<File>();
+        ArrayList<Entry> jsonEncodedEntries = new ArrayList<>();
         PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         Resource[] folderList = null;
         try {
@@ -32,11 +34,41 @@ public class EntryController {
         }
         for(Resource file : folderList) {
             String currentFile = file.getFilename();
-            if(currentFile.compareTo("template.json") != 0) {
-                entries.add(file.getFilename());
+            if (currentFile.compareTo("template.json") != 0) {
+                try {
+                    entries.add(file.getFile());
+                } catch (Exception e) {
+
+                }
             }
         }
-        return entries;
+
+        for(File entry : entries) {
+            StringBuilder sb = new StringBuilder();
+
+            try {
+                FileReader fileReader;
+                fileReader = new FileReader(entry);
+
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+                fileReader.close();
+
+            } catch(Exception e) {
+
+            }
+            Gson gson = new Gson();
+            Entry entryObject = gson.fromJson(sb.toString(), Entry.class);
+            jsonEncodedEntries.add(entryObject);
+        }
+
+        return jsonEncodedEntries;
     }
 
     public Entry getEntryByDate() {
