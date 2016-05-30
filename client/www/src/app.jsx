@@ -3,6 +3,7 @@ import Header from './components/header.jsx';
 import Footer from './components/footer.jsx';
 import Menu from './containers/menu-container.jsx';
 import Entry from './containers/entry-container.jsx';
+import $ from 'jQuery';
 
 require('./app.scss');
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import {getBaseUrl} from '../main/util';
+import $ from 'jQuery';
 
 require('./entry.scss');
+require('../main/prettify.js');
 
 var PictureContent = React.createClass({
     render: function() {
@@ -116,6 +118,16 @@ class Entry extends React.Component {
         super(props);
     }
 
+    componentDidUpdate() {
+        function doPrettyPrint() {
+            (function(){
+                $('pre').addClass('prettyprint');
+                prettyPrint();
+            })();
+        }
+        doPrettyPrint();
+    }
+
     render() {
         var entry = this.props.currentEntry;
         if(!entry.title) {
@@ -138,8 +150,7 @@ class Entry extends React.Component {
         }
 
         return (
-            <div id="rxBlogEntry" className="entry">
-                <h3 className="post-title">{entry.title}</h3>
+            <div className="entry">
                 <div className="post-article">
                     <div className="post-field">
                         <div className="subtitle">{entry.subtitle}</div>

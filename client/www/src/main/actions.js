@@ -5,6 +5,8 @@ export const FETCH_ENTRIES = 'FETCH_ENTRIES';
 export const RECIEVE_ENTRIES = 'RECIEVE_ENTRIES';
 export const REQUEST_ENTRIES = 'REQUEST_ENTRIES';
 
+export const CHANGE_ENTRY = 'CHANGE_ENTRY';
+
 export function fetchEntries() {
     return function(dispatch) {
         dispatch(requestEntries());
@@ -28,5 +30,12 @@ export function recieveEntries(entries) {
         type: RECIEVE_ENTRIES,
         loading: false,
         entries: entries
+    }
+}
+
+export function changeEntry(entry) {
+    return {
+        type: CHANGE_ENTRY,
+        currentEntry: entry
     }
 }

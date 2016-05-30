@@ -1,11 +1,14 @@
 import { connect } from 'react-redux'
 import Menu from '../components/menu.jsx';
-import {fetchEntries} from '../main/actions';
+import {fetchEntries, changeEntry} from '../main/actions';
 
 const mapDispatchToProps = (dispatch) => {
     return {
         onInitialLoad: () => {
             dispatch(fetchEntries());
+        },
+        onChange: (entry) => {
+            dispatch(changeEntry(entry))
         }
     }
 };

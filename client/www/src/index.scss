@@ -57,6 +57,17 @@ hr {
   box-shadow: 0 0 10px 1px black;
 }
 
+.app {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.article-selector {
+  select {
+    width: 100%;
+  }
+}
+
 .img-cont {
   margin: 10px;
   padding: 10px;
@@ -100,7 +111,6 @@ hr {
     padding-bottom: 20px;
   }
   .prettyprint {
-    background-color: $white-header;
     border-radius: 5px;
   }
 }
