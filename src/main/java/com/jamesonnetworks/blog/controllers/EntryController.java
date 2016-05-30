@@ -2,6 +2,10 @@ package com.jamesonnetworks.blog.controllers;
 
 import com.google.gson.Gson;
 import com.jamesonnetworks.blog.domain.entry.Entry;
+import org.apache.log4j.ConsoleAppender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -20,6 +24,8 @@ import java.util.ArrayList;
 @EnableAutoConfiguration
 public class EntryController {
 
+    private static final Logger log = LoggerFactory.getLogger(EntryController.class);
+
     @RequestMapping(path="/entries", method= RequestMethod.GET)
     public ArrayList<Entry> getAllEntries() {
         ArrayList<File> entries = new ArrayList<File>();
@@ -30,7 +36,7 @@ public class EntryController {
             folderList = resourcePatternResolver.getResources("classpath:static/entries/*.json");
         }
         catch(Exception e) {
-
+            log.info(e.getMessage());
         }
         for(Resource file : folderList) {
             String currentFile = file.getFilename();
@@ -38,7 +44,7 @@ public class EntryController {
                 try {
                     entries.add(file.getFile());
                 } catch (Exception e) {
-
+                    log.info(e.getMessage());
                 }
             }
         }
@@ -61,7 +67,7 @@ public class EntryController {
                 fileReader.close();
 
             } catch(Exception e) {
-
+                log.info(e.getMessage());
             }
             Gson gson = new Gson();
             Entry entryObject = gson.fromJson(sb.toString(), Entry.class);
