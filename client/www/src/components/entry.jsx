@@ -11,7 +11,7 @@ var PictureContent = React.createClass({
         var content = this.props.content;
         var picture = {};
         var date = this.props.date;
-        picture.url = getBaseUrl() + '/entries/' + date + '_' + content.id + '.' + content.fileType;
+        picture.url = getBaseUrl() + 'entries/' + date + '_' + content.id + '.' + content.fileType;
         picture.alttext = content.altText;
         return (
             <div className="post-content img-cont"><img src={picture.url} alt={content.altText} className="img"/></div>
