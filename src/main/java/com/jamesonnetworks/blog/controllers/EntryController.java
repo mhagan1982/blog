@@ -33,7 +33,7 @@ public class EntryController {
         PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         Resource[] folderList = null;
         try {
-            folderList = resourcePatternResolver.getResources("classpath:static/entries/*.json");
+            folderList = resourcePatternResolver.getResources("classpath*:static/entries/*.json");
         }
         catch(Exception e) {
             log.info(e.getMessage());
