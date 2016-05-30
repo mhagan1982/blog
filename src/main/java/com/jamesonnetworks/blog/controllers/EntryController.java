@@ -28,7 +28,7 @@ public class EntryController {
 
     @RequestMapping(path="/entries", method= RequestMethod.GET)
     public ArrayList<Entry> getAllEntries() {
-        ArrayList<File> entries = new ArrayList<File>();
+        ArrayList<InputStream> entries = new ArrayList<InputStream>();
         ArrayList<Entry> jsonEncodedEntries = new ArrayList<>();
         PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         Resource[] folderList = null;
@@ -42,21 +42,19 @@ public class EntryController {
             String currentFile = file.getFilename();
             if (currentFile.compareTo("template.json") != 0) {
                 try {
-                    entries.add(file.getFile());
+                    entries.add(file.getInputStream());
                 } catch (Exception e) {
                     log.info(e.getMessage());
                 }
             }
         }
 
-        for(File entry : entries) {
+        for(InputStream entry : entries) {
             StringBuilder sb = new StringBuilder();
 
             try {
-                FileReader fileReader;
-                fileReader = new FileReader(entry);
 
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entry));
 
                 String line;
 
@@ -64,7 +62,7 @@ public class EntryController {
                     sb.append(line);
                 }
 
-                fileReader.close();
+                entry.close();
 
             } catch(Exception e) {
                 log.info(e.getMessage());
