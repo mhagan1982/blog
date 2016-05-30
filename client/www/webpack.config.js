@@ -4,21 +4,16 @@ var ExtractPlugin = require('extract-text-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var LiveReloadPlugin = require('webpack-livereload-plugin');
-var production = process.env.NODE_ENV.toString().trim() === 'production';
-var development = process.env.NODE_ENV.toString().trim() === 'development';
+var production = process.env.NODE_ENV === 'production';
 var path = require("path");
 
-var plugins = [];
-if(development) {
-    plugins = plugins.concat([new HtmlWebpackPlugin({
-            title: 'JamesonNetworks Blog',
-            template: 'src/index.ejs', // Load a custom template (ejs by default but can be changed)
-            inject: 'body' // Inject all scripts into the body (this is the default so you can skip it)
-        })
-    ]);
-}
-plugins = plugins.concat([
-	new LiveReloadPlugin(),
+var plugins = [
+    new LiveReloadPlugin(),
+    new HtmlWebpackPlugin({
+        title: 'JamesonNetworks Blog',
+        template: 'src/index.ejs', // Load a custom template (ejs by default but can be changed)
+        inject: 'body' // Inject all scripts into the body (this is the default so you can skip it)
+    }),
     new CopyWebpackPlugin([
         { from: 'pub/', to: '../../../src/main/resources/static/' },
         { from: 'entries/', to: '../../../src/main/resources/static/entries/' },
@@ -29,7 +24,7 @@ plugins = plugins.concat([
         children:  true, // Look for common dependencies in all children,
         minChunks: 2, // How many times a dependency must come up before being extracted
     }),
-]);
+];
 
 if (production) {
     plugins = plugins.concat([
@@ -75,39 +70,39 @@ module.exports = {
     debug:   !production,
     devtool: production ? false : 'eval',
     entry:  [
-		'./src/index.jsx'
-	],
-	output: {
-		path:          path.resolve(__dirname, 'pub'),
-		filename:      production ? '[name]-[hash].js' : 'bundle.js',
-		chunkFilename: '[name]-[chunkhash].js',
-		publicPath:    '/',
-	},
-	plugins: plugins,
+        './src/index.jsx'
+    ],
+    output: {
+        path:          path.resolve(__dirname, 'pub'),
+        filename:      production ? '[name]-[hash].js' : 'bundle.js',
+        chunkFilename: '[name]-[chunkhash].js',
+        publicPath:    '/',
+    },
+    plugins: plugins,
     module: {
 
-		loaders: [
-			{
-				test : /\.jsx?/,
-				include : path.resolve(__dirname, 'src'),
-				loaders : ['babel']
-			},
-			{
-				test:    /\.js/,
-				loaders:  ['babel'],
-				include: __dirname + '/src'
-			},
-			{
+        loaders: [
+            {
+                test : /\.jsx?/,
+                include : path.resolve(__dirname, 'src'),
+                loaders : ['babel']
+            },
+            {
+                test:    /\.js/,
+                loaders:  ['babel'],
+                include: __dirname + '/src'
+            },
+            {
                 test:   /\.scss/,
                 loader: ExtractPlugin.extract('style', 'css!sass'),
             },
-			{
-				test:   /\.html/,
-				loader: 'html',
-			}
-		]
+            {
+                test:   /\.html/,
+                loader: 'html',
+            }
+        ]
     },
-	eslint: {
-	    configFile: '.eslintrc'
-	}
+    eslint: {
+        configFile: '.eslintrc'
+    }
 };
