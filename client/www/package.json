@@ -4,8 +4,8 @@
   "description": "JamesonNetworks Blog",
   "scripts": {
     "test": "mocha  --compilers js:babel-core/register",
-    "start": "set NODE_ENV=development && webpack --watch --define process.env.NODE_ENV='development'",
-    "production": "set NODE_ENV=production && webpack -p --define process.env.NODE_ENV='production'"
+    "start": "webpack --watch",
+    "production": "webpack -p --define process.env.NODE_ENV='production'"
   },
   "keywords": [],
   "author": "",
