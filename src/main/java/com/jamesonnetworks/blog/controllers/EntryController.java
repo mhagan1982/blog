@@ -2,6 +2,11 @@ package com.jamesonnetworks.blog.controllers;
 
 import com.google.gson.Gson;
 import com.jamesonnetworks.blog.domain.entry.Entry;
+import com.jamesonnetworks.blog.domain.entry.EntryComporator;
+import org.apache.log4j.ConsoleAppender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -20,37 +25,37 @@ import java.util.ArrayList;
 @EnableAutoConfiguration
 public class EntryController {
 
+    private static final Logger log = LoggerFactory.getLogger(EntryController.class);
+
     @RequestMapping(path="/entries", method= RequestMethod.GET)
     public ArrayList<Entry> getAllEntries() {
-        ArrayList<File> entries = new ArrayList<File>();
+        ArrayList<InputStream> entries = new ArrayList<InputStream>();
         ArrayList<Entry> jsonEncodedEntries = new ArrayList<>();
         PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         Resource[] folderList = null;
         try {
-            folderList = resourcePatternResolver.getResources("classpath:static/entries/*.json");
+            folderList = resourcePatternResolver.getResources("classpath*:static/entries/*.json");
         }
         catch(Exception e) {
-
+            log.info(e.getMessage());
         }
         for(Resource file : folderList) {
             String currentFile = file.getFilename();
             if (currentFile.compareTo("template.json") != 0) {
                 try {
-                    entries.add(file.getFile());
+                    entries.add(file.getInputStream());
                 } catch (Exception e) {
-
+                    log.info(e.getMessage());
                 }
             }
         }
 
-        for(File entry : entries) {
+        for(InputStream entry : entries) {
             StringBuilder sb = new StringBuilder();
 
             try {
-                FileReader fileReader;
-                fileReader = new FileReader(entry);
 
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entry));
 
                 String line;
 
@@ -58,16 +63,17 @@ public class EntryController {
                     sb.append(line);
                 }
 
-                fileReader.close();
+                entry.close();
 
             } catch(Exception e) {
-
+                log.info(e.getMessage());
             }
             Gson gson = new Gson();
             Entry entryObject = gson.fromJson(sb.toString(), Entry.class);
             jsonEncodedEntries.add(entryObject);
         }
 
+        jsonEncodedEntries.sort(new EntryComporator());
         return jsonEncodedEntries;
     }
 
