@@ -27,10 +27,7 @@ public class BlogApplication {
 		return new WebMvcConfigurerAdapter() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				if (environment.compareTo("\"develop\"") == 0) {
-					registry.addMapping("/v1/**").allowedOrigins("http://market.dev");
-					registry.addMapping("/v1/**").allowedOrigins("*");
-				}
+				registry.addMapping("/v1/**").allowedOrigins("*");
 			}
 		};
 	}
