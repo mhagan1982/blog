@@ -10,8 +10,9 @@ class Header extends React.Component {
     render() {
         return (
             <div className="header">
-                Welcome to the JamesonNetworks Blog
-            </div>
+                Welcome to the Progblog
+</div>
+
         );
     }
 }

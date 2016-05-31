@@ -1,0 +1,32 @@
+.commentBox {
+  background: #eee;
+  width: 90%;
+  margin: 2em auto;
+  border: 6px solid #e2e2e2;
+}
+
+h3 {
+  padding: 0.3em;
+}
+.commentList {
+
+}
+.comment {
+  h2 {
+    font-size: 1em;
+    padding: 0.3em;
+    margin: 0;
+    background: #e1e1e1;
+  }
+  p {
+    padding: 0.3em;
+    margin: 0;
+    margin-bottom: 1em;
+  }
+}
+
+
+.commentForm {
+  background: #e1e1e1;
+  padding: 0.3em;
+}

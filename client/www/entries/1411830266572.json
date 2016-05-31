@@ -1,0 +1,34 @@
+{
+  "title": "Test the blog",
+  "subtitle": "Posted on April 11, 2016 by Matt",
+  "date": "1411830266572",
+  "markdown": {
+    "sections": [
+      {
+        "title": "",
+        "contents": [
+          {
+            "type": "paragraph",
+            "content": "We’ve been off and busy working on different projects so I’ve taken an extended departure from my Project Euler conquests in order to work on some other side projects in addition to the day job and school work. Currently, I’m working on a python script to scan a text file and pull out a few relevant tidbits of information. I’m mostly concerned with Author, Title, and Release Date at the moment. My goal is to be able to take an text based ASCII encoded eBook and add it to a database referenced by the title, name, and file path (And anything else I can scan it for). To accomplish this goal, I’m creating a python script that will scan the first 120 lines of the book and then search for specific keywords like Author, Title, etc. When it finds them, it will marshall those entries into an XML file for easy use by other programs. A bash script will traverse the directory structure to find the book, check the format, unzip if required, and then scan the book title and append to an XML file the description of the book."
+          },
+          {
+            "type": "paragraph",
+            "content": "In the course of trying to accomplish this, I’ve found Python to truly be a breeze to work with. It’s looking better and better as a text scanning choice. In a very short time I was able to get the scanner program reading in the first 120 lines of the text file and looking for the “author:” keyword:"
+          },
+          {
+            "type": "code",
+            "content": "#! /usr/bin/python\nimport re\nimport string\nfrom shutil import copyfile\n\ndef checkline_text( line ):\n        myscan = re.compile(r\"author: [A-z]* [A-z]*\",re.IGNORECASE)\n        m = myscan.match(line)\n        if m is not None:\n                print m.group()\n\ndef checkbook_text( sourcebook, destination ):\n        copyfile (sourcebook, destination)\n\n        i = 0\n\n        openbook = open(destination)\n        for line in openbook.readlines():\n                if i == 120:\n                        break\n                s = line\n                checkline_text(s)\n\n                i = i + 1\n\ndef main():\n        checkbook_text(\"book.txt\",\"analyzed_book.txt\")\n\nif __name__ == \"__main__\":\n        main()"
+          },
+          {
+            "type": "paragraph",
+            "content": "I think the checkbook_text function is pretty self explanatory, but I want to go into more detail about the re.compile statement in the checkline function."
+          },
+          {
+            "type": "paragraph",
+            "content": "Python uses an Re object to represent regular expression searches. The re.compile statement is actually putting together an object that can then be used as a search function. The second line sets m equal to the search object run against the line of text that came into the function. Now, the m object can be analyzed to see if anything useful came out. The if statement is required, because if no match is found, the object comes out as a Python “None” object, which at this point I’m assuming is like a null, but I didn’t dig too far into it. The code in it’s current form will print out the author name in the first lines of text, but I’m working on getting it to do something more useful. Not bad for about a 20 minute foray into the world of Python. I’m looking forward to expanding on what it does."
+          }
+        ]
+      }
+    ]
+  }
+}
