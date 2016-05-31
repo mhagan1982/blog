@@ -2,6 +2,7 @@ package com.jamesonnetworks.blog.controllers;
 
 import com.google.gson.Gson;
 import com.jamesonnetworks.blog.domain.entry.Entry;
+import com.jamesonnetworks.blog.domain.entry.EntryComporator;
 import org.apache.log4j.ConsoleAppender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +73,7 @@ public class EntryController {
             jsonEncodedEntries.add(entryObject);
         }
 
+        jsonEncodedEntries.sort(new EntryComporator());
         return jsonEncodedEntries;
     }
 
